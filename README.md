@@ -17,7 +17,7 @@ A Flutter application that lets users search and browse GIFs using Giphy API.
 
 - BLoC (flutter_bloc) for state management
 - Repository pattern for API communication
-- DTO models (Freezed + JSON Serializable) for parsing
+- Typed models (Freezed + JSON Serializable) for parsing API responses
 
 ## Running the App
 
