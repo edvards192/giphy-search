@@ -34,6 +34,10 @@ flutter run --dart-define=ANDROID_GIPHY_KEY=YOUR_ANDROID_KEY
 flutter run -d ios --dart-define=IOS_GIPHY_KEY=YOUR_IOS_KEY
 ```
 ## Screenshots
-![Search view](screenshots/main.png)
-![GIF detail view](screenshots/inspect.png)
+<table>
+  <tr>
+    <td><img src="screenshots/main.png" width="400"/></td>
+    <td><img src="screenshots/inspect.png" width="400"/></td>
+  </tr>
+</table>
 
