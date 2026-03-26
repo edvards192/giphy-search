@@ -22,14 +22,12 @@ class InspectPage extends StatelessWidget {
         _RatingRow(rating: gif.rating!),
     ];
 
-    final gifWidget = AspectRatio(
-      aspectRatio: 1,
-      child: ClipRRect( // rounds corners
+    final gifWidget = ClipRRect( // rounds corners
         borderRadius: BorderRadius.circular(8),
         child: Image.network(
           // Prefer original GIF, fallback to preview if original is missing.
           gif.originalUrl.isNotEmpty ? gif.originalUrl : gif.previewUrl,
-          fit: BoxFit.cover,
+          fit: BoxFit.contain, // full image
           loadingBuilder: (context, child, progress) {
             if (progress == null) return child;
             // progress indicator while the image is loading
@@ -42,8 +40,7 @@ class InspectPage extends StatelessWidget {
             );
           },
         ),
-      ),
-    );
+      );
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,

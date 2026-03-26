@@ -2,37 +2,38 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'giphy_keys.dart';
 import 'data/giphy_repository.dart';
-import 'views/main_page.dart';
 import 'bloc/main_bloc.dart';
+import 'services/connectivity_service.dart';
+import 'app_shell.dart';
 
-void main() async{
+void main() async {
   // Required before any async/setup work
   WidgetsFlutterBinding.ensureInitialized();
-  // Single repository instance
-  final repo = GiphyRepository(apiKey: GiphyKeys.current);
+  final repo = GiphyRepository(apiKey: GiphyKeys.current); // Single repository instance
+  final connectivityService = ConnectivityService(); // Creates connectivity service dynamic network monitoring
 
-  runApp(MainApp(repo: repo));
+  runApp(
+    MainApp(
+      repo: repo,
+      connectivityService: connectivityService,
+    ),
+  );
 }
 
 class MainApp extends StatelessWidget {
-  const MainApp({super.key, required this.repo});
+  const MainApp({super.key, required this.repo, required this.connectivityService,});
+
   final GiphyRepository repo; // DI via constructor
+  final ConnectivityService connectivityService; // Connectivity service passed down to the app shell
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-    debugShowCheckedModeBanner: false,
-     home: BlocProvider(
-        // One instance MainBloc for the full main page lifecycle, with injected repository.
-        create: (_) => MainBloc(repository: repo),
-        child: const MainPage(),
+    return BlocProvider(
+      // One instance MainBloc for the full main page lifecycle, with injected repository.
+      create: (_) => MainBloc(repository: repo),
+      child: AppShell(
+        connectivityService: connectivityService,
       ),
-      theme: ThemeData(
-        appBarTheme:  const AppBarTheme(
-          backgroundColor: Color(0xFF04318C),
-          foregroundColor: Colors.white,
-        ),
-      )
     );
   }
 }

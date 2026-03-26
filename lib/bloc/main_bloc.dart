@@ -150,11 +150,14 @@ class MainBloc extends Bloc<MainEvent, MainState> {
         ),
       );
     } catch (e) {
+        final msg = e.toString().contains('SocketException')
+      ? 'Network error. Please check your connection.'
+      : 'Failed to load more GIFs. Please try again.';
       // Keeps existing items, just surface error and return to success so UI doesn't blank out
       emit(
         state.copyWith(
           status: MainStatus.success,
-          errorMessage: e.toString(), // snackbar message in UI
+          errorMessage: msg, // snackbar message in UI
         ),
       );
     }

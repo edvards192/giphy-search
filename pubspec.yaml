@@ -14,6 +14,8 @@ dependencies:
   equatable: ^2.0.5
   freezed_annotation: ^2.4.1
   json_annotation: ^4.8.1
+  go_router: any  # For navigation
+  connectivity_plus: ^7.0.0 # For checking internet connectivity dynamically
 
 
 dev_dependencies:

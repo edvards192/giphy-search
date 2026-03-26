@@ -4,12 +4,13 @@
 // shows results in a responsive grid with infinite scroll pagination
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../bloc/main_bloc.dart';
 import '../bloc/main_event.dart';
 import '../bloc/main_state.dart';
 import '../data/models/gif_model.dart';
-import 'inspect_page.dart';
+import '../app_router.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key,});
@@ -56,13 +57,9 @@ class _MainPageState extends State<MainPage> {
     }
   }
 
+  // Navigates to the inspect page and passes the selected GifModel as an argument
   void _openInspect(GifModel gif) {
-    // Open inspect page for the selected GIF.
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => InspectPage(gif: gif),
-      ),
-    );
+    context.push(AppRoutes.inspect, extra: gif);
   }
 
   int _crossAxisCountForWidth(double width) {
@@ -170,43 +167,46 @@ class _MainPageState extends State<MainPage> {
                   // Successful results - gets screen width and picks number of columns
                   final width = MediaQuery.sizeOf(context).width;
                   final crossAxisCount = _crossAxisCountForWidth(width);
+                  final isLoadingMore = state.status == MainStatus.loadingMore;
 
-                return Stack(
-                  children: [
-                    // Results grid
-                    GridView.builder(
-                      controller: _scrollController,
-                      padding: const EdgeInsets.all(4),
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: crossAxisCount,
-                        crossAxisSpacing: 4,
-                        mainAxisSpacing: 4,
-                        childAspectRatio: 1,
-                      ),
-                      itemCount: state.items.length,
-                      itemBuilder: (context, index) {
-                        // Each tile shows preview image and navigates to details
-                        final gif = state.items[index];
-
-                        return _GifTile(
-                          gif: gif,
-                          onTap: () => _openInspect(gif),
-                        );
-                      },
-                    ),
-
-                    // Non-blocking bottom loader while keeping current items visible.
-                    if (state.status == MainStatus.loadingMore)
-                      const Positioned(
-                        bottom: 16,
-                        left: 0,
-                        right: 0,
-                        child: Center(
-                          child: CircularProgressIndicator(),
+                  return CustomScrollView(
+                    controller: _scrollController,
+                    slivers: [
+                      // Grid displaying GIFs
+                      SliverPadding(
+                        padding: const EdgeInsets.all(4),
+                        sliver: SliverGrid(
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: crossAxisCount, // number of columns based on screen width
+                            crossAxisSpacing: 4,
+                            mainAxisSpacing: 4,
+                            childAspectRatio: 1,
+                          ),
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              final gif = state.items[index]; // Gets GIF for current grid item
+                              return _GifTile(
+                                gif: gif,
+                                onTap: () => _openInspect(gif), // Opens inspect page with specific GIF when tapped
+                              );
+                            },
+                            childCount: state.items.length, // total number of GIFs
+                          ),
                         ),
                       ),
-                  ],
-                );
+
+                      // loader at bottom during pagination
+                      if (isLoadingMore)
+                        const SliverToBoxAdapter(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                            child: Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          ),
+                        ),
+                    ],
+                  );
 
                 },
               ),
