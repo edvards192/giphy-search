@@ -111,11 +111,18 @@ class _MainPageState extends State<MainPage> {
             ),
             Expanded(
               child: BlocConsumer<MainBloc, MainState>(
-                // Shows snackbar only for non-fatal errors
-                listenWhen: (prev, next) =>
-                    prev.errorMessage != next.errorMessage &&
-                    next.errorMessage != null &&
-                    next.status != MainStatus.failure,
+                // Shows snackbar only for non-fatal, non-network errors
+                listenWhen: (prev, next) {
+                  final isNewError =
+                      prev.errorMessage != next.errorMessage &&
+                      next.errorMessage != null &&
+                      next.status != MainStatus.failure;
+
+                  final isNetworkError =
+                      next.errorMessage?.toLowerCase().contains('network') ?? false;
+
+                  return isNewError && !isNetworkError;
+                },
                 listener: (context, state) {
                   final msg = state.errorMessage;
                   if (msg != null && msg.isNotEmpty) {
